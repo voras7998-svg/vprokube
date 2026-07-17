@@ -29,15 +29,17 @@ spec:
             secretKeyRef:
               name: app-secret
               key: db-pass
-        volumes:
+      
+      # 👇 Dhyan do bhai, ab ye dono direct pod spec ke level par hain (containers ke parallel)
+      initContainers:
+      - name: busybox
+        image: busybox:latest
+        args: ["rm", "-rf", "/var/lib/mysql/lost+found"]
+        volumeMounts:
         - name: vpro-db-data
-          persistentVolumeClaim:
-            claimName: db-pvc-claim  
+          mountPath: /var/lib/mysql
 
-        initContainers:
-        - name: busybox
-          image: busybox:latest
-          args: ["rm", "-rf", "/var/lib/mysql/lost+found"]
-          volumeMounts:
-          - name: vpro-db-data
-            mountPath: /var/lib/mysql
+      volumes:
+      - name: vpro-db-data
+        persistentVolumeClaim:
+          claimName: db-pvc-claim
